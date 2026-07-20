@@ -1,0 +1,529 @@
+You are the lead gameplay engineer, game systems designer, technical artist, UI/UX designer, and QA owner for this project. Build a polished, playable browser-game vertical slice called "Hookline Rush". Do not stop at a design document, static mockup, or disconnected prototype: implement the game end to end, run it, test it, and leave the repository in a clean state that another developer can continue from.
+
+IMPORTANT WORKING STYLE
+
+- First inspect the existing repository, package files, assets, and instructions. Preserve useful existing work. If the repository is empty, scaffold the project described below.
+- Make a concise implementation plan, then execute it without waiting for approval unless a genuinely blocking decision is impossible to infer.
+- Work in small, verifiable milestones. After each major subsystem, run the relevant checks and fix regressions before continuing.
+- Prefer the simplest robust implementation that produces good game feel. Do not overengineer speculative systems.
+- When a requested feature is too large for the first vertical slice, implement the reusable foundation and one polished representative example rather than several shallow or fake examples.
+- Do not leave important menu buttons, controls, or gameplay systems as nonfunctional placeholders.
+- Keep a short progress checklist in the repository and update it as work is completed.
+- Use original procedural/vector visuals, code-drawn effects, and generated geometric assets where possible. Do not depend on copyrighted assets, paid services, remote APIs, accounts, or a backend.
+- All player-facing text, menus, tutorial text, and settings must be in English.
+
+1. PRODUCT VISION
+
+Hookline Rush is a fast 2.5D-style side-view action parkour game built around running, jumping, prone crawling, wall jumping, grappling, momentum-preserving swings, hazards, monsters, and a single cooldown-based ability slot.
+
+The game has exactly two primary modes:
+
+1. Single Player Stage Run
+   - One player uses the full screen.
+   - The player completes a stage while managing health, movement, hazards, enemies, and ability cooldowns.
+   - A single mistake must not end the run. The run ends only when health reaches zero.
+
+2. Two Player Local Race
+   - Two players race simultaneously using a fixed horizontal split screen: Player 1 on top and Player 2 on the bottom.
+   - Both players receive the same stage layout, hazard timings, enemy arrangement, pickup positions, and difficulty settings.
+   - Each player has an independent instance of the course. Destroying an obstacle, collecting an item, freezing an enemy, or activating anything must affect only that player's course instance.
+   - There is no PvP damage, player collision, shared loot, grappling the opponent, sabotage, or cross-screen attack system.
+   - The first player to reach the finish wins.
+   - If a player's health reaches zero, that player respawns at the beginning of the stage with full health and loses the currently held temporary skill/skill upgrades. The other player continues uninterrupted.
+
+The central fantasy is:
+
+"Build speed, read the route, swing through danger, and use one well-timed ability to break through what would otherwise stop you."
+
+2. TARGET PLATFORM AND REQUIRED STACK
+
+Build a desktop-browser game that can be run locally with ordinary npm commands.
+
+Preferred stack:
+
+- TypeScript with strict mode enabled
+- Phaser 3
+- Phaser Matter Physics / Matter.js for player movement, collisions, rope constraints, and swinging
+- Vite
+- Vitest for deterministic logic and configuration tests
+- ESLint and Prettier, or equivalent project-consistent tools if the repository already has them
+
+Do not replace this with a backend-heavy stack. Do not add authentication, online multiplayer, databases, monetization, or cloud services.
+
+Target:
+
+- Current desktop Chrome, Edge, Firefox, and Safari
+- Smooth 60 FPS on a typical modern laptop at 1920x1080
+- Responsive 16:9 presentation, with sensible letterboxing or safe-area handling at other desktop aspect ratios
+- Keyboard and common browser-supported gamepads
+- Local two-player support using two gamepads, keyboard plus gamepad, or a shared keyboard where rollover permits
+
+If Phaser or Matter is already present, use the installed compatible version rather than changing versions without a reason.
+
+3. SCOPE: A POLISHED VERTICAL SLICE
+
+Build a complete vertical slice with:
+
+- A title screen and main menu
+- Single Player and Two Player Race mode selection
+- Stage selection
+- Difficulty selection
+- Input/device assignment for local multiplayer
+- A short interactive tutorial or tutorial stage
+- Three polished playable stages with different mechanics and visual identities
+- Five difficulty presets driven by data
+- At least six fully functional abilities using one shared skill input
+- At least four enemy archetypes
+- At least eight hazard/obstacle types
+- Full health, damage, invulnerability, fall recovery, death, restart, finish, and result flows
+- Full-screen solo camera and horizontal split-screen race cameras
+- Pause, restart, settings, controls, audio toggles, and result screens
+- Local best times and settings persistence using localStorage
+- Clear README and development commands
+
+Do not attempt ten low-quality stages. Make the first three stages replayable, readable, and fun, then make the content system data-driven so more stages, obstacles, enemies, and abilities can be added without rewriting core systems.
+
+4. CORE CONTROLS: FEW BUTTONS, DEEP COMBINATIONS
+
+The player must need only directional input plus three gameplay action buttons:
+
+- Directional movement
+- Jump
+- Grapple
+- Skill
+
+There must be no separate normal attack, heavy attack, dash, block, weapon swap, grapple-target-cycle, or inventory button.
+
+Recommended gamepad mapping:
+
+- Left stick or D-pad: move; down to prone crawl/fast-fall; up to bias grapple targeting upward
+- A / Cross: jump and wall jump
+- Right Trigger: grapple; hold to remain connected, release to detach
+- X / Square: use the currently equipped skill
+- Start / Menu: pause
+
+Provide sensible keyboard defaults and a readable controls screen. Use an ergonomic shared-keyboard scheme without adding more gameplay actions. Favor gamepads for two-player mode, but do not make them mandatory.
+
+Suggested defaults:
+
+- Player 1: A/D move, W upward grapple bias, S prone crawl/fast-fall, Space jump, E grapple, Q skill
+- Player 2: Left/Right move, Up upward grapple bias, Down prone crawl/fast-fall, Right Shift jump, Enter grapple, Slash skill
+
+Allow device assignment before a two-player race so one device never controls both characters accidentally. If lightweight key rebinding is practical, include it; otherwise expose bindings in one clear configuration module and document them.
+
+5. GAME FEEL AND MOVEMENT
+
+Movement quality is the highest priority. Tune with centralized configuration values rather than magic numbers. Include an optional developer/debug overlay for velocity, grounded state, current grapple target, health, skill cooldown, and FPS.
+
+Implement:
+
+- Responsive horizontal acceleration and deceleration
+- A capped normal run speed and a higher momentum speed attainable through slopes, swings, and boosts
+- Variable-height jump
+- Coyote time
+- Jump input buffering
+- Stable ground detection
+- Down-input prone crawl that discards running momentum and fits under low obstacles
+- Down-input air fast-fall
+- Wall contact detection and wall jumping without a separate button
+- Limited repeated wall jumping so the player cannot climb every wall indefinitely
+- Landing feedback, speed trails, dust/energy particles, light camera response, and readable animation states
+- Fast recovery after nonfatal damage so the action does not become stop-start
+
+The player should be enjoyable to move in an empty test room before combat and stage complexity are considered complete.
+
+6. GRAPPLING SYSTEM
+
+The grapple is the signature mechanic and must feel physical, predictable, and generous rather than frustrating.
+
+Requirements:
+
+- One active grapple connection per player
+- Press/hold the grapple button to attach and remain connected; release to detach
+- Preserve incoming velocity when attaching and preserve tangential velocity when releasing
+- Use a stable rope/constraint implementation with a visible energy rope
+- Provide subtle swing assistance only if needed to maintain fun; do not make swinging fully automatic
+- Use directional input to let the player pump or influence a swing within controlled limits
+- Use aim assistance within a forward/upward cone to select a valid anchor at high speed
+- Bias targeting with player movement direction and upward directional input
+- Never choose an anchor behind a nearer wall or through solid occluders
+- Show the selected anchor with a subtle reticle/highlight before connection
+- Visually distinguish usable, moving, fragile, and magical anchors
+- Support fixed anchors, moving anchors, and fragile single-use anchors in the content system
+- Grapple has no arbitrary cooldown; its constraints are anchor availability, range, line of sight, and player timing
+- When no valid anchor exists, give immediate visual/audio feedback without disrupting movement
+
+Add automated or deterministic tests for target selection, range filtering, line-of-sight rules, and course-instance isolation. Physics feel must also be tested manually in a dedicated grapple test room.
+
+7. HEALTH, DAMAGE, FALLS, AND FAILURE
+
+Use a 100 HP health bar. Keep damage values in data/configuration.
+
+Baseline damage values to tune:
+
+- Small enemy hit: 10
+- Projectile: 15
+- Spikes: 20
+- Laser or crushing hazard: 25
+- Heavy enemy hit: 30
+- Falling into a pit: 25
+
+Rules:
+
+- After taking damage, grant approximately 0.8-1.2 seconds of clearly communicated invulnerability.
+- Damage may reduce momentum or create a short knockback, but must not cause long stuns or remove control for several seconds.
+- If the player falls into a pit with HP remaining, subtract fall damage and return them quickly to the most recent validated safe ledge/checkpoint position. Do not reset the run.
+- In single player, only reaching zero HP ends the run. Show a fast retry/result flow.
+- In two-player race, zero HP immediately triggers a brief, readable respawn transition and returns only that player to the stage start with full HP. The opponent continues. Reset that player's temporary skill and upgrades.
+- Prevent damage loops: a respawned or recovered player must not appear inside the same hazard and die repeatedly.
+- Place limited health pickups fairly. In a race, each player has an independent copy of each pickup.
+
+8. ONE-SLOT COOLDOWN SKILL SYSTEM
+
+There is one active skill slot and one skill button. This is how the player attacks monsters, breaks protected obstacles, or gains special movement. Skills never affect the other player.
+
+Pickup behavior:
+
+- Touching a skill core instantly equips it if the slot is empty or replaces the current skill if occupied.
+- Do not open an inventory or interrupt gameplay with a modal choice.
+- Briefly show the skill name and icon near the HUD.
+- The HUD must clearly show the equipped skill, whether it is ready, and the remaining cooldown using a radial or similarly readable display.
+- Cooldowns are per player.
+- In race mode, all skill effects remain inside the owner's independent course instance.
+
+Fully implement at least these six skills:
+
+1. Impact Dash
+   - A short forward burst that damages enemies and breaks cracked walls.
+   - Cooldown target: 5 seconds.
+
+2. Energy Bolt
+   - A fast forward projectile for flying enemies, turrets, and trigger targets.
+   - Cooldown target: 3 seconds.
+
+3. Energy Shield
+   - Negates the next valid hit within a short duration.
+   - Cooldown target: 10 seconds.
+
+4. Freeze Pulse
+   - Temporarily freezes nearby enemies and supported moving hazards in the player's own course.
+   - Cooldown target: 10 seconds.
+
+5. Ground Slam
+   - Drives the player downward, damages ground enemies, and breaks fragile floors.
+   - Cooldown target: 4 seconds.
+
+6. Temporary Anchor
+   - Creates a short-lived grapple anchor at a validated point ahead/upward so it cannot spawn inside geometry.
+   - Cooldown target: 10 seconds.
+
+Create a clean ability interface/base class so future abilities can be added through registration and configuration. Optional skill upgrades may improve range, duration, or cooldown during a run, but do not add extra buttons. Temporary upgrades reset after the stage or after a race-mode death.
+
+Minor enemies may also be defeated automatically by a sufficiently high-speed body impact. Armored enemies and reinforced obstacles require an appropriate skill or an alternate route. The player must never need to stop and perform stationary combat.
+
+9. OBSTACLES AND HAZARDS
+
+Implement at least eight polished types selected from the list below. Every danger needs a readable silhouette, color language, animation, warning, and collision behavior.
+
+Required core set:
+
+- Floor and wall spikes
+- Solid walls and low prone-crawl tunnels
+- Cracked breakable walls
+- Moving platforms
+- Moving/crushing walls
+- Timed laser gates with clear pre-fire telegraphs
+- Rotating blades or pendulum hazards
+- Pits with fall recovery
+
+Strong additional candidates:
+
+- Flame jets
+- Fragile floors
+- Falling debris
+- Conveyor belts
+- Wind or gravity fields
+- Rising lava/energy chase zones
+- Moving grapple anchors
+- Single-use fragile anchors
+
+Whenever reasonable, give an obstacle two possible responses: evade it through movement or counter it with a suitable skill. Do not make every obstacle solvable by the same ability.
+
+10. ENEMIES
+
+Enemies are moving route problems, not stationary combat encounters. All attacks need anticipation and telegraphing.
+
+Implement at least four archetypes:
+
+1. Charger
+   - Telegraphs, then charges in a straight line.
+   - Can be avoided, defeated by impact, or used to break a cracked barrier when baited correctly.
+
+2. Flyer
+   - Patrols in the air and fires a slow readable projectile.
+   - Can occupy an otherwise ideal grapple line.
+
+3. Turret
+   - Shows an aiming line, then fires.
+   - Can be destroyed with Energy Bolt or bypassed with timing/alternate routes.
+
+4. Armored Blocker
+   - Blocks the shortest route.
+   - Requires Impact Dash/Ground Slam or a slower bypass route.
+
+Use simple state machines, object pooling for common projectiles/effects, and per-instance ownership so no enemy can target or affect the player in the other race viewport.
+
+11. STAGE DESIGN
+
+Every stage should be approximately 2-5 minutes for a first successful clear and shorter when mastered. Race stages must not be so long that returning to the start after death becomes hopeless or tedious.
+
+Use a data-driven stage/segment format. A stage should generally contain:
+
+1. Start zone that lets the player build speed
+2. Introduction of the stage's main mechanic
+3. A skill pickup or meaningful route choice
+4. A high-intensity combination section
+5. A readable final sprint and finish gate
+
+Frequently offer three route philosophies:
+
+- Safe route: longer and less mechanically demanding
+- Speed route: shorter but requires accurate grappling and momentum
+- Skill route: contains enemies/obstacles but rewards the player with health, a strong ability, or a shortcut
+
+Build these three complete stages:
+
+A. Neon Rooftops - introductory
+   - Cyberpunk skyline, holographic signs, moving train, drones, glass/cracked walls, fixed and moving anchors.
+   - Teaches running, jumping, prone crawling, basic grappling, and Impact Dash.
+
+B. Arcane Foundry - intermediate
+   - A fusion of industrial machinery and magical furnaces: conveyors, crushers, flame jets, rotating mechanisms, rune-powered constructs, breakable floors, and timed hazards.
+   - Emphasizes cooldown planning and alternate routes.
+
+C. Gravity Ruins - advanced
+   - Floating ancient architecture inside a neon dimensional rift: gravity fields, moving anchors, disappearing platforms, magical projectiles, long aerial swings, and Temporary Anchor opportunities.
+   - Emphasizes spatial reading and mastery of momentum.
+
+Create future-ready theme definitions/placeholders in documentation or data schemas for Frozen Sanctum, Jungle Ruins, Monster Nest, Collapsing Temple, Sky Fortress, Magma Core, and Digital Rift, but do not build empty menu entries pretending those stages are playable.
+
+12. DIFFICULTY SYSTEM
+
+Implement five data-driven presets that modify hazard speed, enemy aggression/projectile cadence, damage, grapple assistance, health pickup frequency, and selected timing windows. Do not create separate duplicated stage files.
+
+- Beginner: strong grapple assist, slower hazards, more health pickups, forgiving timing
+- Normal: intended default balance
+- Advanced: faster hazards, fewer pickups, more active enemies
+- Expert: tighter timing, reduced grapple assist, longer selected skill cooldowns
+- Nightmare: minimal assistance, complex timing, very scarce healing, high but still fair damage
+
+Both players in a race must always use the same preset. Random behavior must use the same seeded sequence for equivalent course instances so both players receive an equivalent challenge. Player actions may cause their personal instance to diverge after the race begins.
+
+13. TWO-PLAYER SPLIT-SCREEN ARCHITECTURE
+
+This is a critical technical requirement.
+
+- Render Player 1 in the top half and Player 2 in the bottom half of the same canvas.
+- Give each player an independent camera following only their course and character.
+- Use the same immutable stage blueprint/seed to instantiate two isolated copies of the course.
+- Separate collision categories, entity ownership, pickups, projectiles, enemies, effects, timers, and event buses by course/player instance.
+- A player must never see, collide with, target, damage, freeze, destroy, collect, or trigger anything in the other instance.
+- Keep camera shake and post-processing local to the affected viewport.
+- Pause behavior should pause the whole race fairly.
+- Do not simulate a fake race with a prerecorded opponent.
+
+Add a narrow central divider with a compact shared race-progress visualization. Each viewport HUD should contain only:
+
+- Player label/color
+- Health bar
+- Current skill and cooldown
+- Stage progress percentage or distance-to-finish
+
+Do not cover large parts of either half-screen. At the finish, show a clear winner result, both completion states/times, and rematch/stage-select options.
+
+14. ART DIRECTION: CYBERPUNK + ARCANE FANTASY
+
+Create a coherent original visual language that combines cyberpunk technology with magical fantasy, adjusted to each stage rather than applying the same neon overlay everywhere.
+
+Visual foundation:
+
+- Deep navy/black/obsidian environments
+- Electric cyan and magenta for cyber technology
+- Arcane violet, indigo, and warm gold for magic/runes
+- Glass-like HUD panels with crisp borders and subtle glow
+- Layered parallax backgrounds to create a 2.5D sense of depth
+- Geometric silhouettes, energy trails, rune circles, particles, and restrained bloom-like effects
+- Strong foreground/background separation and excellent hazard readability
+
+Consistent interaction color language:
+
+- Cyan: normal grapple anchor
+- Gold: moving or special anchor
+- White cracks: breakable surface
+- Red/orange: damage hazard
+- Green: health/recovery
+- Violet: gravity/magical effect
+
+Accessibility and clarity are more important than visual noise. Avoid constant full-screen flashes, excessive chromatic aberration, unreadable bloom, tiny fonts, and background detail that hides hazards. Include toggles for screen shake, reduced flashes/effects, master/music/SFX volume, and fullscreen where supported.
+
+Use code-drawn geometry, gradients, particles, shader-like effects, and small original SVG/canvas assets as appropriate. Create simple but intentional player/enemy silhouettes and animation states; do not use plain default rectangles as the final visible presentation.
+
+15. UI AND GAME FLOW
+
+Implement a complete, keyboard/gamepad-navigable flow:
+
+- Boot/loading screen
+- Title screen
+- Main menu
+- Mode selection
+- Player/device assignment for race mode
+- Stage selection with difficulty and best-time display
+- Controls/tutorial
+- Gameplay HUD
+- Pause menu
+- Settings
+- Single-player game-over/retry screen
+- Stage-complete results
+- Race winner/results/rematch screen
+
+Use English UI copy. Keep transitions fast. The player should be able to launch a stage, restart it, return to stage select, and start a rematch without reloading the web page.
+
+Persist locally:
+
+- Audio and accessibility settings
+- Input preferences where practical
+- Best single-player times by stage and difficulty
+- Tutorial completion
+
+16. AUDIO
+
+Provide a functional audio layer with separate master, music, and SFX controls. If external audio assets are unavailable, generate lightweight original Web Audio tones/noise-based effects or include clearly licensed local assets.
+
+At minimum provide distinct feedback for:
+
+- Jump/landing
+- Grapple connect/release/failure
+- Skill ready/use
+- Damage
+- Health pickup
+- Enemy defeat
+- Countdown
+- Respawn
+- Finish/win
+
+Music may be a simple original looping cyber-arcane ambience/rhythm. Never delay core implementation to search for elaborate audio assets.
+
+17. CODE ARCHITECTURE
+
+Keep the code understandable and extensible. Suggested boundaries:
+
+- scenes: boot, menu, stage select, gameplay, results, settings
+- entities: player, enemies, projectiles, pickups, hazards, anchors
+- systems: input, grapple, abilities, health/damage, race, checkpoints, audio, effects
+- levels: immutable blueprints, segments, stage builders, seeded RNG
+- data/config: movement tuning, difficulty presets, damage, abilities, stage metadata, controls
+- ui: HUD, menus, split-screen progress, prompts
+- tests: deterministic systems and regression coverage
+
+Use typed interfaces for course ownership and ability/hazard contracts. Keep physics tuning values centralized. Avoid a single enormous scene or player class. Clean up event listeners, Matter bodies, timers, particles, and constraints when scenes restart.
+
+17A. CONTENT DATA REQUIREMENTS
+
+At minimum, the following should be configurable without editing system logic:
+
+- Player movement and grapple tuning
+- Ability cooldowns and core effects
+- Damage values and invulnerability duration
+- Difficulty modifiers
+- Stage metadata and segment sequence
+- Enemy spawn type/position
+- Hazard type/position/timing
+- Anchor type/position/range
+- Pickup type/position
+- Finish position and safe recovery positions
+
+Validate stage data in development so malformed content fails with a useful error rather than silently breaking a race.
+
+18. TESTING AND VERIFICATION
+
+Do not claim completion based only on a successful build.
+
+Automated checks should cover suitable nonvisual logic, including:
+
+- Seeded stage generation/equivalence
+- Difficulty modifier application
+- Health, invulnerability, and death rules
+- Single-player fall recovery versus zero-HP game over
+- Race-mode zero-HP return to stage start
+- Skill cooldown state and replacement behavior
+- Course-instance isolation
+- Grapple target filtering and priority
+- localStorage serialization with safe defaults
+
+Manual/playtest checklist:
+
+- Complete every stage in single-player mode
+- Complete a two-player race using two independent inputs
+- Verify that Player 1 actions never change Player 2's course and vice versa
+- Die from damage and pits in both modes and verify the different restart rules
+- Verify every skill, obstacle, enemy, route, pause action, menu, and result button
+- Resize the browser and verify full-screen and split-screen layouts
+- Test gamepad disconnect/reconnect behavior gracefully
+- Check that text remains readable in each half-screen
+- Check that grapple constraints are always removed on death, restart, and scene exit
+- Check for physics bodies, projectiles, timers, or audio continuing after restart
+- Check performance with both course instances active
+
+Before final handoff, run and fix:
+
+- Type checking
+- Linting
+- Automated tests
+- Production build
+
+If browser automation or screenshots are available, use them to inspect the main menu, solo HUD, split-screen race, pause menu, and results screen. Fix obvious clipping, overlap, broken layering, and unreadable contrast.
+
+19. DEFINITION OF DONE
+
+The vertical slice is done only when all of the following are true:
+
+- A new user can install dependencies and start the game using documented commands.
+- All three stages are playable from start to finish.
+- Movement and grappling feel responsive and preserve momentum.
+- The player needs only directional input, jump, grapple, and skill during gameplay.
+- All six required skills function and show correct cooldown state.
+- Health is visible and follows the exact single-player and race-mode failure rules.
+- Two-player race uses horizontal split screen and truly isolated, equivalent course instances.
+- There is no player-versus-player attack or cross-course effect.
+- Obstacles and enemies are readable and can be handled through movement, skills, or route choice.
+- Menus, settings, pause, restart, finish, results, and rematch flows work without page reloads.
+- The cyberpunk/arcane presentation is coherent and does not look like a bare physics demo.
+- Type checking, tests, linting, and production build pass.
+- README documents setup, controls, modes, architecture, how to add a stage/ability/hazard, and any honest remaining limitations.
+
+20. IMPLEMENTATION ORDER
+
+Use this priority order unless the existing repository strongly suggests a better one:
+
+1. Inspect/scaffold project and establish runnable build
+2. Create movement test room and tune running, jumping, prone crawling, wall jump
+3. Implement and tune grappling/anchor targeting
+4. Add health, damage, pit recovery, and mode-specific death rules
+5. Implement one-slot skill framework and the six skills
+6. Implement obstacles and four enemy archetypes
+7. Build Neon Rooftops and validate the full solo loop
+8. Build true two-instance horizontal split-screen race mode
+9. Build Arcane Foundry and Gravity Ruins using reusable stage data
+10. Complete menus, device assignment, HUD, results, persistence, settings, audio, and accessibility
+11. Perform automated and manual verification, visual polish, performance cleanup, and documentation
+
+At the end, provide a concise handoff containing:
+
+- What was implemented
+- Exact commands to run, test, and build
+- Key controls
+- Important architectural choices
+- Verification performed and results
+- Remaining limitations or the next three highest-value improvements
+
+Begin by inspecting the repository and then implement the game. Do not merely rewrite this specification.

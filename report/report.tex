@@ -1,0 +1,241 @@
+\documentclass[11pt,letterpaper]{article}
+
+% pdflatex-compatible Times family (the standard LaTeX equivalent of
+% Times New Roman for text and mathematics).
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage[letterpaper,top=0.68in,bottom=0.60in,left=0.88in,right=0.88in,
+            headheight=22pt,headsep=0.10in,footskip=0.28in]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{navy}{HTML}{17324D}
+\definecolor{cyan}{HTML}{008BA3}
+\definecolor{muted}{HTML}{5A6673}
+\definecolor{rulegray}{HTML}{CBD2D9}
+
+\hypersetup{
+  pdftitle={Hookline Rush: Vibe-Coding Project Report},
+  pdfauthor={[Your Name]},
+  pdfsubject={Creative AI Coding Project}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3.5pt}
+\setlength{\emergencystretch}{1.5em}
+\linespread{1.015}
+
+\titleformat{\section}
+  {\Large\bfseries\color{navy}}{}{0pt}{}
+  [\vspace{1pt}\color{cyan}\titlerule]
+\titlespacing*{\section}{0pt}{2pt}{7pt}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{navy}}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{8pt}{2pt}
+
+\setlist[itemize]{
+  leftmargin=1.35em,
+  label=\textcolor{cyan}{\textbullet},
+  itemsep=1.8pt,
+  topsep=3pt,
+  parsep=0pt,
+  partopsep=0pt
+}
+\setlist[enumerate]{
+  leftmargin=1.6em,
+  itemsep=1.8pt,
+  topsep=3pt,
+  parsep=0pt,
+  partopsep=0pt
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{muted}\textsc{Hookline Rush}}
+\fancyhead[R]{\small\color{muted}Vibe-Coding Project Report}
+\fancyfoot[C]{\small\color{muted}\thepage}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{rulegray}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrulewidth}{0pt}
+
+\newcommand{\projectname}{\textit{Hookline Rush}}
+\newcommand{\keyterm}[1]{\textbf{\color{navy}#1}}
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% Standalone cover page
+% -----------------------------------------------------------------------------
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+
+  \vspace*{0.72in}
+  {\small\bfseries\color{cyan}\MakeUppercase{Vibe-Coding Project Report}\par}
+
+  \vspace{0.72in}
+  {\fontsize{34}{39}\selectfont\bfseries\color{navy}Hookline Rush\par}
+  \vspace{0.16in}
+  {\fontsize{15}{19}\selectfont\color{muted}
+    Parkour momentum, physical grappling, and split-screen rivalry\par}
+
+  \vspace{0.38in}
+  {\color{cyan}\rule{2.75in}{1.2pt}\par}
+
+  \vspace{0.52in}
+  {\large\itshape
+    A polished browser-game vertical slice built through\par
+    AI-assisted design, engineering, and iterative playtesting\par}
+
+  \vfill
+
+  \begin{minipage}{0.66\textwidth}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{@{}>{\bfseries\color{navy}}p{1.35in}p{2.85in}@{}}
+      Student: & \textit{[Your Name]} \\
+      Course: & \textit{[Course Name]} \\
+      Date: & \textit{[Date]} \\
+      Live Demo: & \textit{[Live Demo URL]} \\
+    \end{tabular}
+  \end{minipage}
+
+  \vspace{0.72in}
+  {\small\color{muted}
+    Built with TypeScript, Phaser 3, Matter Physics, Vite, and Codex\par}
+\end{titlepage}
+
+\setcounter{page}{2}
+
+% -----------------------------------------------------------------------------
+% Main content, page 1 of 4
+% -----------------------------------------------------------------------------
+\section{Overview and Concept}
+
+\projectname{} is a fast, neon-styled browser platformer about preserving momentum while making rapid route decisions. The player controls the Comet Courier, an agile runner who can sprint, perform a small jump or upgrade it with a precisely timed second tap, wall-jump, crawl through low spaces, grapple onto physical anchors, and activate one temporary ability. The central hook is that these actions do not feel like isolated buttons: they overlap. A good run may begin with a large jump, convert into a grapple swing, release onto an upper route, and finish with a dash through a hazard before the skill cooldown resets.
+
+The game was designed as a complete vertical slice rather than a loose technology demo. It includes a guided Momentum Lab, three themed stages, five difficulty presets, a results flow, saved best times, settings, original audio, and both solo and two-player modes. The default player-facing interface is Simplified Chinese, while this report is written in English for the assignment. Everything needed to play is bundled locally; after installation, the game does not depend on a backend, user account, or remote asset service.
+
+\subsection{The Player Experience}
+
+The desired feeling is controlled improvisation. Movement is fast enough to reward commitment, but the player still has tools to recover. Coyote time and jump buffering make inputs forgiving without automating the route. Falling in solo mode costs health and returns the player to the latest safe checkpoint; it does not immediately erase the whole run. Grapple anchors are visibly placed near meaningful gaps and alternate paths, so the rope is both a traversal mechanic and a route-selection language.
+
+The one-slot skill system adds a small strategic decision without turning the game into inventory management. Picking up a new ability immediately replaces the current one. A player therefore chooses between preserving a familiar tool and adapting to the opportunities of the next section. This limitation keeps the control scheme compact---direction, jump, grapple, and skill---while still supporting six distinct abilities: Impact Dash, Energy Bolt, Energy Shield, Freeze Pulse, Ground Slam, and Temporary Anchor.
+
+\section{Design and Creativity}
+
+The creative goal was to make a game in which each environment changes how the same movement vocabulary is read. \keyterm{Neon Rooftops} begins with a legible jump rhythm, then mixes prone tunnels, grapple pits, moving trains, drones, lasers, and high alternate routes. \keyterm{Arcane Foundry} emphasizes timing through conveyors, crushers, flame jets, fragile floors, and rotating blades. \keyterm{Gravity Ruins} uses wind and gravity fields, moving anchors, disappearing platforms, and recovery landings to make the trajectory itself feel unstable.
+
+The Comet Courier also gives the mechanics a coherent visual identity. The character is assembled as an articulated code-drawn rig with a meteor helmet, asymmetrical courier jacket, armored grapple forearm, parkour shoes, and two speed-reactive energy scarves. Separate limbs support recognizable poses for running, crawling, jumping, grappling, slamming, and knockback. The rope begins at the forward hand rather than cutting through the torso, and the active collision width follows the visible pose. This makes the character design functional: silhouette, animation, and physical interaction reinforce one another.
+
+The most playful extension is local two-player racing. Instead of merely placing two characters in one camera, the game creates two equal full-height viewports. Each racer receives an independent camera, physics category, entity set, HUD, timer, and progress state while playing the same seeded stage blueprint. Players can take different routes or suffer different hazards without one player's effects leaking into the other's course. The result feels like two simultaneous speedruns sharing one screen.
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% Main content, page 2 of 4
+% -----------------------------------------------------------------------------
+\section{Key Features}
+
+\begin{itemize}
+  \item \keyterm{Expressive momentum system.} Ground and air movement share a responsive speed model. The first jump press launches immediately; releasing and pressing again within a 220 ms window upgrades the same rising jump once. Wall jumps, fast-fall, acceleration, reversal, and soft speed caps are tuned as parts of one movement system.
+
+  \item \keyterm{Physical grappling.} Candidate anchors are filtered by activity, range, forward cone, and line of sight. The best target is selected from the player's forward and upward intent, then connected with a Matter constraint. Releasing the button, dying, restarting, or finishing always removes the constraint cleanly.
+
+  \item \keyterm{Real prone traversal.} Pressing down while grounded enters a controlled crawl and physically reduces the collider from standing height to a 26-pixel profile. Releasing down restores standing height only after a region query confirms headroom. In the air, the same input remains fast-fall, so one key has a contextually clear purpose.
+
+  \item \keyterm{One-slot abilities.} Six pickups support attack, defense, crowd control, impact movement, and player-created grapple opportunities. Cooldowns and immediate replacement keep decisions readable during a fast run, while the course-scoped activation interface prevents abilities from affecting the wrong racer.
+
+  \item \keyterm{Hazards and opponents.} Spikes, pits, timed lasers, crushers, flame jets, rotating blades, moving or disappearing platforms, conveyors, cracked walls, wind fields, and gravity fields create varied traversal problems. Charger, Flyer, Turret, and Armored Blocker enemies add moving threats without changing the compact control scheme.
+
+  \item \keyterm{Solo progression and local competition.} Solo runs use health, checkpoints, recovery, finish timing, and persistent best times by stage and difficulty. Local races support a shared keyboard, keyboard plus gamepad, or two gamepads, including readable fallback behavior when an assigned controller disconnects.
+
+  \item \keyterm{Accessibility and tuning.} Players can adjust master, music, and sound-effect volume, disable screen shake, reduce effects, toggle a debug overlay, and use fullscreen. Five presets from Beginner to Nightmare alter assistance, timing, damage, healing, enemy cadence, and cooldowns without changing the core movement speed.
+\end{itemize}
+
+\section{A Deliberate Learning Curve}
+
+The Momentum Lab introduces one idea at a time before combining it with another. It separates the small jump from the release-then-press large jump, provides a safe first grapple, teaches a genuinely crawl-only tunnel, and later asks the player to crawl on a moving platform before combining grappling and Impact Dash. This sequence matters because the final stages assume fluency rather than pausing for repeated explanations.
+
+Level construction is data-driven. Platforms, hazards, anchors, enemies, pickups, checkpoints, and the finish position are authored as immutable stage blueprints. Seeded materialization gives race players equivalent layouts and makes procedural timing reproducible in tests. Development validation rejects duplicate identifiers, malformed pickups, unsafe finish data, and invalid stage structures early.
+
+The difficulty presets change pressure rather than secretly changing the player's basic ability. A beginner receives more assistance and forgiving timing; Nightmare increases hazard and enemy demands. Because the avatar's fundamental speed remains constant, practice transfers between settings. This was an important design decision: the course becomes harder, but the controller does not become unfamiliar.
+
+Finally, failure is treated as information. Safe checkpoints and visible recovery landings encourage another attempt, while best times turn a first clear into a self-directed optimization challenge. In two-player mode, reaching zero health restarts only that racer at full health and removes the held skill; the opponent continues. The punishment is meaningful, but the shared race does not stop.
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% Main content, page 3 of 4
+% -----------------------------------------------------------------------------
+\section{Technical Implementation}
+
+The project uses strict TypeScript, Phaser 3 for scenes and rendering, Matter Physics for bodies and constraints, Vite for bundling, and Vitest for deterministic regression tests. It is entirely client-side. Versioned local storage preserves settings, tutorial completion, and best times, with safe defaults for absent or malformed data.
+
+\subsection{Architecture and Isolation}
+
+Core modules contain deterministic movement, input-edge handling, health, contact geometry, persistence, player state, and grapple targeting. Level modules define and validate immutable blueprints; scenes manage menus and flow; systems handle devices, audio, abilities, and course simulation.
+
+The central boundary is \texttt{CourseRuntime}. One instance owns one player and that course's anchors, hazards, enemies, pickups, projectiles, effects, timers, and HUD. Solo mode creates one runtime; a race creates two. Separate collision categories and render layers prevent cross-course contact, while each camera ignores the other course. A third camera draws only the progress divider. Isolation is therefore enforced by ownership rather than scattered conditionals.
+
+The articulated avatar is layered over a hidden Matter body. The body resizes in place for prone movement, preserving velocity, filters, listeners, ownership, and foot position. Filled-shape contact handles triangular spikes, star blades, ellipses, and multipart enemies, reducing unfair damage from broad rectangular approximations.
+
+\subsection{How AI Supported the Build}
+
+I used OpenAI Codex as a collaborative implementation partner. The starting prompt assigned it the roles of gameplay engineer, systems designer, technical artist, UI/UX designer, and QA owner, then translated the idea into constraints for controls, physics, modes, levels, polish, and verification. This made its output more consistent than disconnected feature requests.
+
+The workflow was iterative: implement a bounded system, inspect it, then turn fragile behavior into a pure function or regression test before expanding. Grapple selection became a deterministic filter-and-score function; jump tapping became explicit input-edge state; prone recovery gained a headroom query; and race abilities received a course-scoped capability context. Each change solved an integration problem while protecting earlier work from later edits.
+
+AI helped explore edge cases such as controller disconnects, restart cleanup, repeated collider resizing, occluded anchors, seeded race equivalence, and save migration. Generated code was never accepted merely because it compiled: automated checks, runtime debug data, and browser review supplied evidence. Creative prompting plus verification became the project's main engineering lesson.
+
+\subsection{Notable Challenges and Solutions}
+
+\begin{itemize}
+  \item \keyterm{Fairness versus spectacle:} Visible pit edges, protected takeoffs, recovery landings, and unobstructed anchor checks kept dramatic routes readable.
+  \item \keyterm{Animation versus collision:} Pose-width contact, foot anchoring, headroom checks, and filled-geometry damage aligned the visible character with physics.
+  \item \keyterm{Two-player interference:} Runtime ownership, collision categories, scoped abilities, and isolated cameras stopped effects from leaking between courses.
+\end{itemize}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% Main content, page 4 of 4
+% -----------------------------------------------------------------------------
+\section{Execution and Verification}
+
+The completed repository passes strict type checking, ESLint, all 82 deterministic tests across 17 test files, and a production Vite build. The tests cover movement response, jump timing, coyote time and buffering, prone collision geometry, headroom recovery, filled-shape contact, player-state transitions, animation containment, grapple targeting, health and failure rules, ability isolation, localization, persistence, seeded stage generation, race layout, and route reachability.
+
+Browser review at 1280 by 720 checked the title screen, controls, settings, solo selection, tutorial, race setup, countdown, dual-camera gameplay, HUD layout, prone transitions, and the opening readability of all three formal stages. A debug overlay exposes velocity, grounded state, the current or selected anchor, health, cooldown information, and frame rate. This was useful for connecting visual feel to measurable state rather than tuning only by guesswork.
+
+The project is still honest about the edge of its polish. A final production pass should include two physical gamepads across several browsers, full end-to-end stage clears on different refresh rates, broader aspect-ratio testing, and exhaustive combinations of abilities with enemies and hazards. These are targeted feel and hardware checks, not missing core systems. The implemented slice is playable and verified, while its remaining work is clearly bounded.
+
+\section{Reflection: What I Learned}
+
+My biggest lesson is that vibe-coding works best when ``vibe'' describes the creative direction, not the standard of evidence. AI made it possible to move rapidly between game design, physics, UI, animation, localization, and testing, but the project became coherent only after I defined stable boundaries. A single active skill, a small control vocabulary, immutable stage data, and one runtime per course gave the AI fewer ambiguous ways to connect features.
+
+I also learned that polish often comes from removing contradictions. The prone animation did not feel convincing until the body actually became shorter. The character art did not feel integrated until the collider tracked its silhouette and the rope began at the hand. Split-screen did not feel trustworthy until each player owned an isolated simulation. In each case, the solution was not simply more visual detail; it was agreement between appearance, rules, and implementation.
+
+Most importantly, the project changed my view of AI-assisted development. The strongest results came from a loop of intention, generation, inspection, testing, and revision. AI accelerated both invention and implementation, while explicit tests preserved decisions over time. That let a playful weekend idea grow into something I would be comfortable showing another player rather than only demonstrating as code.
+
+\section{Live Demo and How to Try It}
+
+\textbf{Live build:} \textit{[Live Demo URL]}
+
+If a hosted link is not yet available, the game can be run locally with Node.js 20 or newer:
+
+\begin{enumerate}
+  \item Open a terminal in the project directory and run \texttt{npm install}.
+  \item Run \texttt{npm run dev}, then open the local URL printed by Vite.
+  \item Start with Momentum Lab. For Player 1, use WASD to move or crawl, Space to jump, E to grapple, Q to use the current skill, and Esc to pause. A quick release and second press of Space upgrades a rising jump.
+  \item After the tutorial, try a solo stage for a best time or launch a two-player local race. The controls screen lists the Player 2 and gamepad mappings.
+\end{enumerate}
+
+For technical verification, \texttt{npm run check} runs type checking, linting, tests, and a production build.
+
+\end{document}
