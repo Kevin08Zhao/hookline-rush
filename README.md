@@ -1,8 +1,8 @@
 # Hookline Rush
 
-The complete player-facing game now defaults to Simplified Chinese (`zh-CN`) under the title **钩索疾驰**. Player-facing strings live in `src/game/i18n.ts`; internal identifiers and developer-only debug labels remain English.
+Hookline Rush is a browser-based parkour game built around momentum and precision grappling. Run, jump, crawl through low passages, and swing past hazards in solo stages or a local two-player race. The game is built with TypeScript, Phaser 3, Matter physics, and Vite.
 
-Hookline Rush is a polished browser-game vertical slice about running, jumping, prone crawling, wall jumps, physical grappling, hazards, enemies, and a one-slot cooldown ability. It is built with strict TypeScript, Phaser 3, Matter physics, and Vite.
+The interface defaults to English (`en-US`), including menus, controls, tutorials, settings, gameplay messages, and results. Interface text is maintained in `src/game/i18n.ts`.
 
 Everything is original and code-drawn. The game has no backend, remote assets, accounts, or network dependency after installation.
 
@@ -115,9 +115,9 @@ The optional debug overlay shows velocity, grounded state, current/selected grap
 
 ## Verification and honest limitations
 
-Automated coverage checks matching grounded/airborne directional response, prone crawl speed and momentum removal, immediate/double-tap jump behavior, input edge equivalence and player isolation, coyote/buffer timing, physical prone collider sizing/foot anchoring/filter retention, pose-width solid contact, filled-shape damage contact, pose-to-collider containment, headroom blocking and release, repeated prone/body stability, all authored low-tunnel clearances, exact small/large jump obstacle margins, visible pit coverage, takeoff runways, recovery landings, unobstructed grapple targeting, safe checkpoints, hazard variety, Chinese localization coverage/fallback, seeded equivalence, blueprint validation, health/failure rules, skills, course isolation, and versioned saves.
+Automated coverage checks matching grounded/airborne directional response, prone crawl speed and momentum removal, immediate/double-tap jump behavior, input edge equivalence and player isolation, coyote/buffer timing, physical prone collider sizing/foot anchoring/filter retention, pose-width solid contact, filled-shape damage contact, pose-to-collider containment, headroom blocking and release, repeated prone/body stability, all authored low-tunnel clearances, exact small/large jump obstacle margins, visible pit coverage, takeoff runways, recovery landings, unobstructed grapple targeting, safe checkpoints, hazard variety, English localization coverage/fallback, seeded equivalence, blueprint validation, health/failure rules, skills, course isolation, and versioned saves.
 
-Browser visual QA was performed at 1280×720 for the Chinese title, controls, settings, solo stage selection, tutorial, race setup/device assignment, and live dual-camera split-screen. Runtime debug QA also verifies pose-driven horizontal contact widths, 64→26→64 height transitions, prone-to-airborne jumping, airborne Down/fast-fall exclusivity, restart cleanup, simultaneous two-player crawling, and one-player-only state isolation. See [MANUAL_QA.md](MANUAL_QA.md) for the exact status.
+Earlier browser visual QA was performed at 1280×720 for the previous Chinese title, controls, settings, solo stage selection, tutorial, race setup/device assignment, and live dual-camera split-screen. Runtime debug QA also verifies pose-driven horizontal contact widths, 64→26→64 height transitions, prone-to-airborne jumping, airborne Down/fast-fall exclusivity, restart cleanup, simultaneous two-player crawling, and one-player-only state isolation. See [MANUAL_QA.md](MANUAL_QA.md) for the exact status.
 
 Current limitations:
 
